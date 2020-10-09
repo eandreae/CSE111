@@ -12,6 +12,7 @@ using namespace std;
 
 ubigint::ubigint (unsigned long that){//: ubig_value (that) {
    //DEBUGF ('~', this << " -> " << uvalue)
+   
    // Turn the unsigned long that into individual numbers
    // to be passed into the ubigint.
    int temp = 0;
@@ -19,11 +20,10 @@ ubigint::ubigint (unsigned long that){//: ubig_value (that) {
       // Get the least order digit %10
       temp = that % 10; // Stores the remainder.
       // Push the remainder onto the vector.
-      
-
-      
-
-
+      ubig_value.push_back(temp);
+      // Divide the number by 10.
+      that = that / 10;
+      // Re-loop at the start.
    }
 
 }
