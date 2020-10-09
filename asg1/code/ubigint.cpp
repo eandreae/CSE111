@@ -5,6 +5,7 @@
 #include <exception>
 #include <stack>
 #include <stdexcept>
+#include <vector>
 using namespace std;
 
 #include "ubigint.h"
@@ -12,7 +13,7 @@ using namespace std;
 
 ubigint::ubigint (unsigned long that){//: ubig_value (that) {
    //DEBUGF ('~', this << " -> " << uvalue)
-   
+
    // Turn the unsigned long that into individual numbers
    // to be passed into the ubigint.
    int temp = 0;
@@ -25,16 +26,23 @@ ubigint::ubigint (unsigned long that){//: ubig_value (that) {
       that = that / 10;
       // Re-loop at the start.
    }
-
+   printf("Not String version debug\n");
+   for (int iter = ubig_value.size()-1; iter >= 0; iter-- ){
+      printf("%i", ubig_value[iter]);
+   }
+   printf("\n");
 }
 
-ubigint::ubigint (const string& that): uvalue(0) {
+ubigint::ubigint (const string& that){//: uvalue(0) {
    //DEBUGF ('~', "that = \"" << that << "\"");
    for (char digit: that) {
       if (not isdigit (digit)) {
          throw invalid_argument ("ubigint::ubigint(" + that + ")");
       }
-      uvalue = uvalue * 10 + digit - '0';
+      
+      //uvalue = uvalue * 10 + digit - '0'; - Given to us.
+
+      ubig_value.insert(0, digit - '0');
       // 4829
       // %10 9 -> v0
       // /10 482
@@ -45,7 +53,13 @@ ubigint::ubigint (const string& that): uvalue(0) {
       // %10 4 -> v3
       // /10 0
       // 9 2 8 4
+      
    }
+   printf("String version debug\n");
+   for (int iter = ubig_value.size()-1; iter >= 0; iter-- ){
+      printf("%i", ubig_value[iter]);
+   }
+   printf("\n");
 }
 
 ubigint ubigint::operator+ (const ubigint& that) const {
