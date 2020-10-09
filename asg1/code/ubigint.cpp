@@ -10,17 +10,41 @@ using namespace std;
 #include "ubigint.h"
 #include "debug.h"
 
-ubigint::ubigint (unsigned long that): uvalue (that) {
-   DEBUGF ('~', this << " -> " << uvalue)
+ubigint::ubigint (unsigned long that){//: ubig_value (that) {
+   //DEBUGF ('~', this << " -> " << uvalue)
+   // Turn the unsigned long that into individual numbers
+   // to be passed into the ubigint.
+   int temp = 0;
+   while (that != 0){
+      // Get the least order digit %10
+      temp = that % 10; // Stores the remainder.
+      // Push the remainder onto the vector.
+      
+
+      
+
+
+   }
+
 }
 
 ubigint::ubigint (const string& that): uvalue(0) {
-   DEBUGF ('~', "that = \"" << that << "\"");
+   //DEBUGF ('~', "that = \"" << that << "\"");
    for (char digit: that) {
       if (not isdigit (digit)) {
          throw invalid_argument ("ubigint::ubigint(" + that + ")");
       }
       uvalue = uvalue * 10 + digit - '0';
+      // 4829
+      // %10 9 -> v0
+      // /10 482
+      // %10 2 -> v1
+      // /10 48
+      // %10 8 -> v2
+      // /10 4
+      // %10 4 -> v3
+      // /10 0
+      // 9 2 8 4
    }
 }
 
