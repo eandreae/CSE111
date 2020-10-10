@@ -17,6 +17,11 @@ ubigint::ubigint (unsigned long that){//: ubig_value (that) {
    // Turn the unsigned long that into individual numbers
    // to be passed into the ubigint.
    int temp = 0;
+   // In the case where 0 is given.
+   if ( that == 0){
+      ubig_value.push_back(0);
+   }
+   // Otherwise, continue.
    while (that != 0){
       // Get the least order digit %10
       temp = that % 10; // Stores the remainder.
@@ -42,18 +47,8 @@ ubigint::ubigint (const string& that){//: uvalue(0) {
       
       //uvalue = uvalue * 10 + digit - '0'; - Given to us.
 
-      ubig_value.insert(0, digit - '0');
-      // 4829
-      // %10 9 -> v0
-      // /10 482
-      // %10 2 -> v1
-      // /10 48
-      // %10 8 -> v2
-      // /10 4
-      // %10 4 -> v3
-      // /10 0
-      // 9 2 8 4
-      
+      ubig_value.insert(ubig_value.begin(), digit - '0');
+
    }
    printf("String version debug\n");
    for (int iter = ubig_value.size()-1; iter >= 0; iter-- ){
@@ -63,9 +58,108 @@ ubigint::ubigint (const string& that){//: uvalue(0) {
 }
 
 ubigint ubigint::operator+ (const ubigint& that) const {
-   DEBUGF ('u', *this << "+" << that);
-   ubigint result (uvalue + that.uvalue);
-   DEBUGF ('u', result);
+   //DEBUGF ('u', *this << "+" << that);
+   printf("chicken tasty ubigint\n");
+   ubigint result;
+   //DEBUGF ('u', result);
+
+   // Initializing variables.
+   int carry = 0; // Initialized at 0.
+   int smaller_size = 0; // Initialized at 0.
+   int larger_size  = 0; // Initialized at 0.
+   
+   
+   bool that_is_larger = false; // Initialized with false.
+
+   // Perform comparisons to find the smaller vector length.
+   if ( that.ubig_value.size() > ubig_value.size() ){
+      // if that > this, then smaller_size = this.
+      smaller_size   = ubig_value.size();
+      larger_size    = that.ubig_value.size();
+      that_is_larger = true;
+      printf("that > this\n");
+   } else {
+      // Otherwise, this >= that.
+      smaller_size   = that.ubig_value.size();
+      larger_size    = ubig_value.size();
+      that_is_larger = false;
+      printf("this >= that\n");
+   }
+   printf("smaller_size = %i\n", smaller_size);
+   printf("larger_size = %i\n", larger_size);
+   // In the case where this and that are of equal size,
+   // smaller_size and larger_size are equal.
+
+   // Core loop #1.
+   // This loop iterates where both vectors have values.
+   // It takes the values and adds them, taking into account
+   // Of a possible carry value.
+   for ( int iter = 0; iter <= smaller_size-1; iter++ ){
+      // Initliaze the temporary result.
+      int t_result = 0;
+      // Perform the addition, with the carry.
+      t_result = that.ubig_value[iter] + ubig_value[iter] + carry;
+      // Calculate the carry value.
+      carry = t_result / 10; // If it is > 9, carry = 1.
+      // Shave off the remainder, if a remainder.
+      t_result = t_result % 10;
+      // Push the t_result into the resulting bigint.
+      result.ubig_value.push_back(t_result);
+      printf("Core Loop #1 progress\n");
+      printf("carry value    = %i\n", carry);
+      printf("t_result value = %i\n", t_result);
+   }
+   // Core loop #2.
+   // This loop iterates over the larger vector,
+   // adding the rest of the values onto the result
+   // bigint vector.
+   // This loop does not perform if the sizes are equal.
+   for ( int iter = smaller_size-1; iter < larger_size-1; iter++ ){
+      // Initialize the temporary result.
+      int t_result = 0;
+      // Perform the addition with the carry.
+      // The addition depends on the larger vector.
+      if ( that_is_larger == true ){
+         // Iterate over "that" vector.
+         t_result = that.ubig_value[iter] + carry;
+         // Calculate the carry value.
+         carry = t_result / 10; // If it is > 9, carry = 1.
+         // Shave off the remainder, if a remainder.
+         t_result = t_result % 10;
+         // Push the t_result into the resulting bigint.
+         result.ubig_value.push_back(t_result);
+         printf("Core Loop #2 progress\n");
+         printf("carry value    = %i\n", carry);
+         printf("t_result value = %i\n", t_result);
+         printf("that_is_larger == true\n");
+      } else {
+         // Otherwise, that_is_larger == false.
+         // We iterate over "this" vector.
+         t_result = ubig_value[iter] + carry;
+         // Calculate the carry value.
+         carry = t_result / 10; // IF it is > 9, carry = 1.
+         // Shave off the remainder, if a remainder.
+         t_result = t_result % 10;
+         // Push the t_result into the resulting bigint.
+         result.ubig_value.push_back(t_result);
+         printf("Core Loop #2 progress\n");
+         printf("carry value    = %i\n", carry);
+         printf("t_result value = %i\n", t_result);
+         printf("that_is_larger == false\n");
+      }
+   }
+   // Final operations.
+   // Check if the carry value >= 1.
+   // If it is, add the carry onto the result bigint vector.
+   printf("Final operations\n");
+   if ( carry >= 1 ){
+      printf("adding on the carry");
+      result.ubig_value.push_back(carry);
+   }
+   // Otherwise, do nothing.
+   printf("carry value    = %i\n", carry);
+
+   // Return the resulting ubigint.
    return result;
 }
 
@@ -127,7 +221,13 @@ bool ubigint::operator< (const ubigint& that) const {
    return uvalue < that.uvalue;
 }
 
-ostream& operator<< (ostream& out, const ubigint& that) { 
-   return out << "ubigint(" << that.uvalue << ")";
+ostream& operator<< (ostream& out, const ubigint& that) {
+   // Reverse iterate over that.ubig_value.
+   for (int iter = that.ubig_value.size()-1; iter >= 0; iter--){
+      // Print out the information at index iter.
+      out << static_cast<char>(that.ubig_value[iter]+'0');
+   }
+   //return out << "ubigint(" << that.uvalue << ")";
+   return out;
 }
 

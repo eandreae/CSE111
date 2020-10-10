@@ -33,8 +33,11 @@ bigint bigint::operator- () const {
 }
 
 bigint bigint::operator+ (const bigint& that) const {
+   printf("boobies bigint\n");
    ubigint result = uvalue + that.uvalue;
+   cout << result << endl;
    return result;
+   // Adding two ubigints.
 }
 
 bigint bigint::operator- (const bigint& that) const {

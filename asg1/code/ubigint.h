@@ -23,7 +23,7 @@ class ubigint {
       using udigit_t = unsigned char;
       using ubigvalue_t = vector<udigit_t>;
       ubigvalue_t ubig_value;
-      
+
    public:
       void multiply_by_2();
       void divide_by_2();
