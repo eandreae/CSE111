@@ -31,11 +31,12 @@ ubigint::ubigint (unsigned long that){//: ubig_value (that) {
       that = that / 10;
       // Re-loop at the start.
    }
-   printf("Not String version debug\n");
+   /* Debugging.
    for (int iter = ubig_value.size()-1; iter >= 0; iter-- ){
       printf("%i", ubig_value[iter]);
    }
    printf("\n");
+   */
 }
 
 ubigint::ubigint (const string& that){//: uvalue(0) {
@@ -50,16 +51,16 @@ ubigint::ubigint (const string& that){//: uvalue(0) {
       ubig_value.insert(ubig_value.begin(), digit - '0');
 
    }
-   printf("String version debug\n");
+   /* Debugging.
    for (int iter = ubig_value.size()-1; iter >= 0; iter-- ){
       printf("%i", ubig_value[iter]);
    }
    printf("\n");
+   */
 }
 
 ubigint ubigint::operator+ (const ubigint& that) const {
    //DEBUGF ('u', *this << "+" << that);
-   printf("chicken tasty ubigint\n");
    ubigint result;
    //DEBUGF ('u', result);
 
@@ -77,16 +78,12 @@ ubigint ubigint::operator+ (const ubigint& that) const {
       smaller_size   = ubig_value.size();
       larger_size    = that.ubig_value.size();
       that_is_larger = true;
-      printf("that > this\n");
    } else {
       // Otherwise, this >= that.
       smaller_size   = that.ubig_value.size();
       larger_size    = ubig_value.size();
       that_is_larger = false;
-      printf("this >= that\n");
    }
-   printf("smaller_size = %i\n", smaller_size);
-   printf("larger_size = %i\n", larger_size);
    // In the case where this and that are of equal size,
    // smaller_size and larger_size are equal.
 
@@ -105,16 +102,13 @@ ubigint ubigint::operator+ (const ubigint& that) const {
       t_result = t_result % 10;
       // Push the t_result into the resulting bigint.
       result.ubig_value.push_back(t_result);
-      printf("Core Loop #1 progress\n");
-      printf("carry value    = %i\n", carry);
-      printf("t_result value = %i\n", t_result);
    }
    // Core loop #2.
    // This loop iterates over the larger vector,
    // adding the rest of the values onto the result
    // bigint vector.
    // This loop does not perform if the sizes are equal.
-   for ( int iter = smaller_size-1; iter < larger_size-1; iter++ ){
+   for ( int iter = smaller_size; iter < larger_size; iter++ ){
       // Initialize the temporary result.
       int t_result = 0;
       // Perform the addition with the carry.
@@ -128,10 +122,6 @@ ubigint ubigint::operator+ (const ubigint& that) const {
          t_result = t_result % 10;
          // Push the t_result into the resulting bigint.
          result.ubig_value.push_back(t_result);
-         printf("Core Loop #2 progress\n");
-         printf("carry value    = %i\n", carry);
-         printf("t_result value = %i\n", t_result);
-         printf("that_is_larger == true\n");
       } else {
          // Otherwise, that_is_larger == false.
          // We iterate over "this" vector.
@@ -142,22 +132,15 @@ ubigint ubigint::operator+ (const ubigint& that) const {
          t_result = t_result % 10;
          // Push the t_result into the resulting bigint.
          result.ubig_value.push_back(t_result);
-         printf("Core Loop #2 progress\n");
-         printf("carry value    = %i\n", carry);
-         printf("t_result value = %i\n", t_result);
-         printf("that_is_larger == false\n");
       }
    }
    // Final operations.
    // Check if the carry value >= 1.
    // If it is, add the carry onto the result bigint vector.
-   printf("Final operations\n");
    if ( carry >= 1 ){
-      printf("adding on the carry");
       result.ubig_value.push_back(carry);
    }
    // Otherwise, do nothing.
-   printf("carry value    = %i\n", carry);
 
    // Return the resulting ubigint.
    return result;
