@@ -31,12 +31,14 @@ ubigint::ubigint (unsigned long that){//: ubig_value (that) {
       that = that / 10;
       // Re-loop at the start.
    }
-   /* Debugging.
-   for (int iter = ubig_value.size()-1; iter >= 0; iter-- ){
-      printf("%i", ubig_value[iter]);
+   // Trim the leading zeros.
+   if ( ubig_value.size() > 0 && ubig_value.back() == 0 ){
+      // Check if the number input literally was a zero.
+      if ( ubig_value.size() == 1 ){
+         
+      }
+      while( ubig_value.back)
    }
-   printf("\n");
-   */
 }
 
 ubigint::ubigint (const string& that){//: uvalue(0) {
@@ -60,9 +62,9 @@ ubigint::ubigint (const string& that){//: uvalue(0) {
 }
 
 ubigint ubigint::operator+ (const ubigint& that) const {
-   //DEBUGF ('u', *this << "+" << that);
+   DEBUGF ('u', *this << "+" << that);
    ubigint result;
-   //DEBUGF ('u', result);
+   DEBUGF ('u', result);
 
    // Initializing variables.
    int carry = 0; // Initialized at 0.
@@ -148,6 +150,15 @@ ubigint ubigint::operator+ (const ubigint& that) const {
 
 ubigint ubigint::operator- (const ubigint& that) const {
    if (*this < that) throw domain_error ("ubigint::operator-(a<b)");
+   // Initialize the resulting ubigint.
+   ubigint result;
+   // Initialize the variables
+   bool this_is_bigger = false;
+   bool that_is_bigger = false;
+
+   // Check which input is bigger than the other,
+   // Or if they are equal.
+   
    return ubigint (uvalue - that.uvalue);
 }
 

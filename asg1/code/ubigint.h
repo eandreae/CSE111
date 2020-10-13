@@ -16,6 +16,9 @@ using namespace std;
 class ubigint {
    friend ostream& operator<< (ostream&, const ubigint&);
    private:
+
+      // Helper function for trimming zeros.
+      
       // replace this later
       using unumber = unsigned long;
       unumber uvalue {};
