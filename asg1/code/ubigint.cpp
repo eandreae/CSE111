@@ -184,17 +184,14 @@ ubigint ubigint::operator- (const ubigint& that) const {
    if ( that.ubig_value.size() > ubig_value.size() ){
       // If that > this, then that_is_bigger = true.
       that_is_bigger = true;
-      cout << "that is bigger" << endl;
    }
    else if ( ubig_value.size() > that.ubig_value.size() ){
       // else, if this > that, then this_is_bigger = true
       this_is_bigger = true;
-      cout << "this is bigger" << endl;
    }
    else {
       // Otherwise, they are the same size, iterate
       // through to find the larger int
-      cout << "same size, checking which is bigger" << endl;
 
       // Initialize required variables
       int size        = that.ubig_value.size()-1;
@@ -202,7 +199,6 @@ ubigint ubigint::operator- (const ubigint& that) const {
 
       // Iterate with a while loop.
       while ( size > -1 && break_check == 0 ){
-         cout << "top of first while loop" << endl;
          // Compare the two numbers at position l_s
          if ( ubig_value[size] > that.ubig_value[size] ){
             // if this[s] > that[s]
@@ -210,7 +206,6 @@ ubigint ubigint::operator- (const ubigint& that) const {
             this_is_bigger = true;
             // Increment break check.
             break_check = break_check + 1;
-            cout << "while - this is bigger" << endl;
          }
          else if ( that.ubig_value[size] > ubig_value[size] ){
             // if that[s] > this[s]
@@ -218,16 +213,13 @@ ubigint ubigint::operator- (const ubigint& that) const {
             that_is_bigger = true;
             // Increment break check.
             break_check = break_check + 1;
-            cout << "while - that is bigger" << endl;
          }
          else {
-            cout << "while - same" << endl;
             // Otherwise, the two numbers are equal.
             // First, de-increment the size.
             size = size - 1;
             // Next, check if that was the lowest order number.
             if ( size <= -1 ){
-               cout << "while - exact same" << endl;
                // They were the exact same number,
                // Return 0.
                result.ubig_value.push_back(0);
@@ -252,25 +244,21 @@ ubigint ubigint::operator- (const ubigint& that) const {
 
    // In the case where this > that
    while ( this_is_bigger && iter <= that_size ){
-      cout << "this - that subtraction start" << endl;
       // while this > that, and iter does < that_size
       // Initialize a temporary result.
       int t_result = 0;
       // Perform the subtraction with the carry variable.
       t_result = ubig_value[iter] - that.ubig_value[iter] + carry;
-      cout << "subtrated the numbers" << endl;
       // Reset the carry value to 0.
       carry = 0;
       // Check if the result < 0
       if ( t_result < 0 ){
-         cout << "carrying the 1" << endl;
          // set the carry to -1.
          carry = -1;
          // Add 10 to the result.
          t_result = t_result + 10;
       }
       // Push the t_result onto the result vector.
-      cout << "pushed the result onto the vector" << endl;
       result.ubig_value.push_back(t_result);
       // Increment the iter variable.
       iter = iter + 1;
@@ -279,25 +267,21 @@ ubigint ubigint::operator- (const ubigint& that) const {
 
    // In the case where that > this
    while ( that_is_bigger && iter <= this_size ){
-      cout << "that - this subtraction start" << endl;
       // while that > this, and iter < this_size
       // Initialize a temporary result.
       int t_result = 0;
       // Perform the subtraction with the carry variable.
       t_result = that.ubig_value[iter] - ubig_value[iter] + carry;
-      cout << "subtrated the numbers" << endl;
       // Reset the carry to 0.
       carry = 0;
       // Check if the result < 0
       if ( t_result < 0 ){
-         cout << "carrying the 1" << endl;
          // set the carry to -1.
          carry = -1;
          // Add 10 to the result.
          t_result = t_result + 10;
       }
       // Push the t_result onto the result vector.
-      cout << "pushed the result onto the vector" << endl;
       result.ubig_value.push_back(t_result);
       // Increment the iter variable.
       iter = iter + 1;
