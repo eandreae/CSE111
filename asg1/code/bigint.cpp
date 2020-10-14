@@ -97,17 +97,7 @@ bigint bigint::operator+ (const bigint& that) const {
          result.is_negative = false;
       }
    }
-
-   if ( uvalue > that.uvalue ){
-      cout << uvalue << " > " << that.uvalue << endl;
-   }
-   else if ( that.uvalue > uvalue ){
-      cout << uvalue << " < " << that.uvalue << endl;
-   }
-   else if ( uvalue == that.uvalue ){
-      cout << uvalue << " = " << that.uvalue << endl;
-   }
-
+   // Return the resulting bigint.
    return result;
    // Adding two ubigints.
 }
@@ -115,8 +105,11 @@ bigint bigint::operator+ (const bigint& that) const {
 bigint bigint::operator- (const bigint& that) const {
    // Initialize result bigint.
    bigint result;
+   
+   // Two cases:
    // a - b
    // b - a
+
    // Run the comparisons to if (this - that) or (that - this).
    // Case 1: a - b
    if ( uvalue > that.uvalue ){
@@ -124,22 +117,16 @@ bigint bigint::operator- (const bigint& that) const {
       result.uvalue = uvalue - that.uvalue;
       // Set the sign to positive.
       result.is_negative = false;
-      // Debug information
-      cout << uvalue << " > " << that.uvalue << endl;
    }
    else if ( that.uvalue > uvalue ){
       // if b > a, subtract the other way, making the sign negative.
       result.uvalue = that.uvalue - uvalue;
       // Set the sign to negative
       result.is_negative = true;
-      // Debug information
-      cout << uvalue << " < " << that.uvalue << endl;
    }
    else {
       // if this == that, subtraction is possible.
       result.uvalue = uvalue - that.uvalue;
-      // Debug information.
-      cout << uvalue << " = " << that.uvalue << endl;
    }
    // Return the result vector.
    return result;
