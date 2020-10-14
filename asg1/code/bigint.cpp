@@ -105,7 +105,7 @@ bigint bigint::operator+ (const bigint& that) const {
 bigint bigint::operator- (const bigint& that) const {
    // Initialize result bigint.
    bigint result;
-   
+
    // Two cases:
    // a - b
    // b - a
@@ -159,7 +159,7 @@ bool bigint::operator< (const bigint& that) const {
 }
 
 ostream& operator<< (ostream& out, const bigint& that) {
-   return out << "bigint(" << (that.is_negative ? "-" : "+")
-              << "," << that.uvalue << ")";
+   return out << (that.is_negative ? "-" : "")
+              <<  that.uvalue;
 }
 
