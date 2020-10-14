@@ -361,11 +361,118 @@ ubigint ubigint::operator% (const ubigint& that) const {
 }
 
 bool ubigint::operator== (const ubigint& that) const {
-   return uvalue == that.uvalue;
+   // Similar to operator<, we can find out
+   // if this == that.
+
+   // Initialize required variables.
+   // None needed.
+
+   // Compare the sizes of the vectors.
+   if ( ubig_value.size() > that.ubig_value.size() ){
+      // if this > that, this is bigger. return false.
+      return false;
+   }
+   else if ( that.ubig_value.size() > ubig_value.size() ){
+      // if that > this, that is bigger. return false.
+      return false;
+   }
+   else {
+      // They are of the same size, compare each by
+      // highest order, descending.
+
+      // Initializing required variables.
+      int size        = that.ubig_value.size()-1;
+      int break_check = 0;
+      // Iterate using a while loop.
+      while ( size > -1 && break_check == 0 ){
+         // Compare the two numbers.
+         if ( ubig_value[size] > that.ubig_value[size] ){
+            // this > that, return false.
+            return false;
+         }
+         else if ( that.ubig_value[size] > ubig_value[size] ){
+            // that > this, return false.
+            return false;
+         }
+         else {
+            // They are the same value, continue iterating.
+            // De-increment size.
+            size = size - 1;
+            // Check if the lowest order has been reached.
+            if ( size <= -1 ){
+               // If this is the case, this == that.
+               return true;
+            }
+            // Otherwise, continue from the top.
+         }
+      }
+   }
+   
+   // If the program somehow gets here, return false.
+   return false;
 }
 
 bool ubigint::operator< (const ubigint& that) const {
-   return uvalue < that.uvalue;
+   // Similar to Step 1 of operator-, we can
+   // find out which is bigger, this or that.
+
+   // Initialize the required variable.
+   bool this_is_bigger = false;
+   bool that_is_bigger = false;
+   
+   // Compare the sizes of the vectors.
+   if ( ubig_value.size() > that.ubig_value.size() ){
+      // If this > that, this is bigger.
+      this_is_bigger = true;
+   }
+   else if ( that.ubig_value.size() > ubig_value.size() ){
+      // If that > this, that is bigger.
+      that_is_bigger = true;
+   }
+   else {
+      // In this case they are of equal sizes,
+      // compare each by highest order, descending.
+
+      // Initialize required variables.
+      int size        = that.ubig_value.size()-1;
+      int break_check = 0;
+      // Iterate using a while loop.
+      while ( size > -1 && break_check == 0 ){
+         // Compare the two numbers.
+         if ( ubig_value[size] > that.ubig_value[size] ){
+            // if this[s] > that[s], this is bigger.
+            this_is_bigger = true;
+            // Incrememnt the break checker.
+            break_check = break_check + 1;
+         }
+         else if ( that.ubig_value[size] > ubig_value[size] ){
+            // if that[s] > this[s], that is bigger.
+            that_is_bigger = true;
+            // Increment the break checker.
+            break_check = break_check + 1;
+         }
+         else {
+            // Otherwise, they are exactly equal.
+            // De-increment size.
+            size = size - 1;
+            // Check if the lowest order has been reached.
+            if ( size <= -1 ){
+               // this == that, return false.
+               return false;
+            }
+            // Otherwise, continue from the top.
+         }
+      }
+   }
+
+   // Once comparisons are finished, compare the results.
+   // operator< is this < that, check this case.
+   if ( that_is_bigger && this_is_bigger == false ){
+      // this < that
+      return true;
+   }
+   // Otherwise, return false.
+   return false;
 }
 
 ostream& operator<< (ostream& out, const ubigint& that) {
