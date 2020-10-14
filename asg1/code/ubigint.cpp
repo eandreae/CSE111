@@ -12,7 +12,7 @@ using namespace std;
 #include "debug.h"
 
 ubigint::ubigint (unsigned long that){//: ubig_value (that) {
-   //DEBUGF ('~', this << " -> " << uvalue)
+   DEBUGF ('~', this << " -> " << uvalue)
 
    // Turn the unsigned long that into individual numbers
    // to be passed into the ubigint.
@@ -50,13 +50,11 @@ ubigint::ubigint (unsigned long that){//: ubig_value (that) {
 }
 
 ubigint::ubigint (const string& that){//: uvalue(0) {
-   //DEBUGF ('~', "that = \"" << that << "\"");
+   DEBUGF ('~', "that = \"" << that << "\"");
    for (char digit: that) {
       if (not isdigit (digit)) {
          throw invalid_argument ("ubigint::ubigint(" + that + ")");
       }
-      
-      //uvalue = uvalue * 10 + digit - '0'; - Given to us.
 
       ubig_value.insert(ubig_value.begin(), digit - '0');
 
