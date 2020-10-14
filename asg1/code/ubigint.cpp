@@ -46,6 +46,9 @@ ubigint::ubigint (unsigned long that){
          trim_temp = ubig_value.back();
          // Go back to the start.
       }      
+   } else if ( ubig_value.size() < 1 ){
+      // If the vector is empty, make it 0.
+      ubig_value.push_back(0);
    }
 }
 
@@ -74,6 +77,9 @@ ubigint::ubigint (const string& that){
          trim_temp = ubig_value.back();
          // Go back to the start.
       }      
+   } else if ( ubig_value.size() < 1 ){
+      // If the vector is empty, make it 0.
+      ubig_value.push_back(0);
    }
 }
 
