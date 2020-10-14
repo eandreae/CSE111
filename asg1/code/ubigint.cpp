@@ -31,13 +31,21 @@ ubigint::ubigint (unsigned long that){//: ubig_value (that) {
       that = that / 10;
       // Re-loop at the start.
    }
-   // Trim the leading zeros.
-   if ( ubig_value.size() > 0 && ubig_value.back() == 0 ){
-      // Check if the number input literally was a zero.
-      if ( ubig_value.size() == 1 ){
-         
-      }
-      while( ubig_value.back)
+   // Trim the leading zeros in front of the first value.
+   if ( ubig_value.size() > 1 && ubig_value.back() == 0 ){
+      // If the vector is only one element, this will not run.
+      // Initialize a temporary integer.
+      int trim_temp = 0;
+      // Set it to the ubig_value.back();
+      trim_temp = ubig_value.back();
+      // Iterate through and pop_back() as long as temp == 0.
+      while ( trim_temp == 0 && ubig_value.size() > 1 ){
+         // Remove the 0 at the back.
+         ubig_value.pop_back();
+         // Set temp to the new back.
+         trim_temp = ubig_value.back();
+         // Go back to the start.
+      }      
    }
 }
 
@@ -53,12 +61,22 @@ ubigint::ubigint (const string& that){//: uvalue(0) {
       ubig_value.insert(ubig_value.begin(), digit - '0');
 
    }
-   /* Debugging.
-   for (int iter = ubig_value.size()-1; iter >= 0; iter-- ){
-      printf("%i", ubig_value[iter]);
+   // Trim the leading zeros in front of the first value.
+   if ( ubig_value.size() > 1 && ubig_value.back() == 0 ){
+      // If the vector is only one element, this will not run.
+      // Initialize a temporary integer.
+      int trim_temp = 0;
+      // Set it to the ubig_value.back();
+      trim_temp = ubig_value.back();
+      // Iterate through and pop_back() as long as temp == 0.
+      while ( trim_temp == 0 && ubig_value.size() > 1 ){
+         // Remove the 0 at the back.
+         ubig_value.pop_back();
+         // Set temp to the new back.
+         trim_temp = ubig_value.back();
+         // Go back to the start.
+      }      
    }
-   printf("\n");
-   */
 }
 
 ubigint ubigint::operator+ (const ubigint& that) const {
