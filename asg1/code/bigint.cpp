@@ -171,12 +171,76 @@ bigint bigint::operator* (const bigint& that) const {
 }
 
 bigint bigint::operator/ (const bigint& that) const {
-   bigint result = uvalue / that.uvalue;
+   // Initialize the bigint result
+   bigint result;
+
+   // Three cases
+   // 1. a / b
+   // 2. (-a) / b OR a / (-b)
+   // 3. (-a) / (-b)
+   // Case 1 -> positive
+   // Case 2 -> negative
+   // Case 3 -> positive
+
+   // Check if only one of them are negative
+   if ( is_negative == true && that.is_negative == false ){
+      // Sign is negative
+      result.is_negative = true;
+      // Calculate the result.
+      result.uvalue = uvalue / that.uvalue;
+   }
+   else if ( is_negative == false && that.is_negative == true ){
+      // Sign is negative
+      result.is_negative = true;
+      // Calculate the result.
+      result.uvalue = uvalue / that.uvalue;
+   }
+   else {
+      // Otherwise, they're either both positive, or both negative.
+      // Sign is positive
+      result.is_negative = false;
+      // Calculate the result.
+      result.uvalue = uvalue / that.uvalue;
+   }
+
+   // Return the result.
    return result;
 }
 
 bigint bigint::operator% (const bigint& that) const {
-   bigint result = uvalue % that.uvalue;
+   // Initialize the bigint result
+   bigint result;
+
+   // Three cases
+   // 1. a / b
+   // 2. (-a) / b OR a / (-b)
+   // 3. (-a) / (-b)
+   // Case 1 -> positive
+   // Case 2 -> negative
+   // Case 3 -> positive
+
+   // Check if only one of them are negative
+   if ( is_negative == true && that.is_negative == false ){
+      // Sign is negative
+      result.is_negative = true;
+      // Calculate the result.
+      result.uvalue = uvalue % that.uvalue;
+   }
+   else if ( is_negative == false && that.is_negative == true ){
+      // Sign is negative
+      result.is_negative = true;
+      // Calculate the result.
+      result.uvalue = uvalue % that.uvalue;
+   }
+   else {
+      // Otherwise, they're either both positive, or both negative.
+      // Sign is positive
+      result.is_negative = false;
+      // Calculate the result.
+      result.uvalue = uvalue % that.uvalue;
+   }
+
+   // Return the result.
    return result;
 }
 
