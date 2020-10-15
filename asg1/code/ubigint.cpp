@@ -316,15 +316,150 @@ ubigint ubigint::operator- (const ubigint& that) const {
 }
 
 ubigint ubigint::operator* (const ubigint& that) const {
-   return ubigint (uvalue * that.uvalue);
+   // Initialize required variables.
+   int order     = 0;  // To keep track of the highest order.
+   int carry     = 0;  // Carry variable.
+   int this_size = ubig_value.size(); // this.size()
+   int that_size = that.ubig_value.size(); // that.size()
+   ubigint result; // resulting ubigint.
+
+   // While loop #1.
+   while ( order < that_size ){
+      // While the order < that_size.
+
+      // Initialize required variables.
+      int this_iter = 0; // iterator for this
+      ubigint t_vect;    // temporary vector
+
+      // Push back any 0s needed onto the t_vect.
+      for ( int iter = 0; iter < order; iter++ ){
+         // Push a 0 onto the t_vect.
+         t_vect.ubig_value.push_back(0);
+      }
+
+      // While loop #2
+      while ( this_iter != this_size ){
+         // while this_iter != this_size
+
+         // Initialize required variables
+         int t_result = 0; // temporary result
+         
+         // Perform the multiplication, adding on a carry
+         t_result = ubig_value[this_iter] * that.ubig_value[order]
+         + carry;
+         // Calculate the carry.
+         carry = t_result / 10;
+         // Set t_result to the remainder.
+         t_result = t_result % 10;
+         // Push t_result onto the temporary vector.
+         t_vect.ubig_value.push_back(t_result);
+         // Iterate this_iter by 1.
+         this_iter = this_iter + 1;
+         
+         // Loop back to the top
+      }
+
+      // Outside of While loop #2, add the t_vect onto the result.
+      result = result + t_vect;
+      // Iterate the order by 1.
+      order = order + 1;
+
+      // Loop back to the top.
+   }
+   // Final operations.
+   // Check if the carry value >= 1.
+   // If it is, add the carry onto the result bigint vector.
+   if ( carry >= 1 ){
+      result.ubig_value.push_back(carry);
+   }
+   // Otherwise, do nothing.
+   
+   return result;
 }
 
 void ubigint::multiply_by_2() {
-   uvalue *= 2;
+   // Initialize required variables
+   int iter  = 0;
+   int carry = 0;
+   int size  = ubig_value.size();
+
+   // Core while loop.
+   while ( iter < size ){
+      // Initialize the required variable
+      int t_result = 0;
+      // Perform this*2 by adding it to itself with the carry.
+      t_result = ubig_value[iter] + ubig_value[iter] + carry;
+      // Calculate the carry
+      carry = t_result / 10;
+      // Put the remainder into t_result.
+      t_result = t_result % 10;
+      // Change the data in this[iter] to t_result.
+      ubig_value[iter] = t_result;
+      // Increment the iterator.
+      iter = iter + 1;
+   }
+
+   // Final adjustments, check if carry > 0
+   if ( carry > 0 ){
+      // Push the carry onto this
+      ubig_value.push_back(carry);
+   }
+
+   // Program over
 }
 
 void ubigint::divide_by_2() {
-   uvalue /= 2;
+   // Initialize required variables.
+   int iter  = ubig_value.size()-1; // Iterator variable
+   int carry = 0; // Carry variable
+   ubigint t_vect; // Temporary vector
+
+   // Core while loop
+   while ( iter > -1 ){
+      // while iter < this.size
+
+      // Initialize required variables
+      int t_result   = 0; // before division
+      int t_d_result = 0; // after division
+      // Calculate the carry part 1
+      carry = carry * 10;
+      // Add this and the carry
+      t_result = ubig_value[iter] + carry;
+      // Divide by t_result by 2.
+      t_d_result = t_result / 2;
+      // Calculate the carry part 2
+      carry = t_result % 2;
+
+      // Check if t_result isn't 0.
+      if ( t_d_result != 0 ){
+         // If t_result is not 0, push it back on t_vect
+         t_vect.ubig_value.push_back(t_d_result);
+      }
+      // Otherwise, do nothing.
+
+      // De increment iter by 1.
+      iter = iter - 1;
+   }
+
+   // t_vect is in reverse order, so we need to reverse it.
+   ubigint t_r_vect; // reversed t_vect
+   int t_iter = t_vect.ubig_value.size()-1; // size of t_vect
+   // Reverse t_vect by reverse iterating and pushing back
+   // into t_r_vect.
+   while ( t_iter > -1 ){
+      // while iterator > -1
+      // Set a temp value equal to t_vect at t_iter
+      int temp = t_vect.ubig_value[t_iter];
+      // Push temp onto the back of t_r_vect.
+      t_r_vect.ubig_value.push_back(temp);
+      // De increment t_iter by 1.
+      t_iter = t_iter - 1;
+   }
+   // At this point, t_r_vect should represent
+   // the correct value.
+   // return this = t_r_vect.
+   ubig_value = t_r_vect.ubig_value;
+
 }
 
 
