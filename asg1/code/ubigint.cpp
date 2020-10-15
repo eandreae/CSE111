@@ -410,55 +410,50 @@ void ubigint::multiply_by_2() {
 
 void ubigint::divide_by_2() {
    // Initialize required variables.
-   int iter  = ubig_value.size()-1; // Iterator variable
-   int carry = 0; // Carry variable
-   ubigint t_vect; // Temporary vector
+   int iter  = 0; // Iterator variable
+   int size  = ubig_value.size(); // size variable.
 
    // Core while loop
-   while ( iter > -1 ){
+   while ( iter < size ){
       // while iter < this.size
-
-      // Initialize required variables
-      int t_result   = 0; // before division
-      int t_d_result = 0; // after division
-      // Calculate the carry part 1
-      carry = carry * 10;
-      // Add this and the carry
-      t_result = ubig_value[iter] + carry;
-      // Divide by t_result by 2.
-      t_d_result = t_result / 2;
-      // Calculate the carry part 2
-      carry = t_result % 2;
-
-      // Check if t_result isn't 0.
-      if ( t_d_result != 0 ){
-         // If t_result is not 0, push it back on t_vect
-         t_vect.ubig_value.push_back(t_d_result);
+      // Divide the current number by 2.
+      ubig_value[iter] = ubig_value[iter] / 2;
+      // Check if the current value is the MSB.
+      if ( iter == size-1 ){
+         // Do nothing
       }
-      // Otherwise, do nothing.
+      else {
+         // Otherwise, check if the next value is odd.
+         if ( ubig_value[iter+1] % 2 == 1 ){
+            // Add 5 onto the current value.
+            ubig_value[iter] = ubig_value[iter] + 5;
+         }
+         // Otherwise, do nothing.
+      }
 
-      // De increment iter by 1.
-      iter = iter - 1;
+      // Increment iter by 1.
+      iter = iter + 1;
    }
 
-   // t_vect is in reverse order, so we need to reverse it.
-   ubigint t_r_vect; // reversed t_vect
-   int t_iter = t_vect.ubig_value.size()-1; // size of t_vect
-   // Reverse t_vect by reverse iterating and pushing back
-   // into t_r_vect.
-   while ( t_iter > -1 ){
-      // while iterator > -1
-      // Set a temp value equal to t_vect at t_iter
-      int temp = t_vect.ubig_value[t_iter];
-      // Push temp onto the back of t_r_vect.
-      t_r_vect.ubig_value.push_back(temp);
-      // De increment t_iter by 1.
-      t_iter = t_iter - 1;
+   // Trim the leading zeros in front of the first value.
+   if ( ubig_value.size() > 1 && ubig_value.back() == 0 ){
+      // If the vector is only one element, this will not run.
+      // Initialize a temporary integer.
+      int trim_temp = 0;
+      // Set it to the ubig_value.back();
+      trim_temp = ubig_value.back();
+      // Iterate through and pop_back() as long as temp == 0.
+      while ( trim_temp == 0 && ubig_value.size() > 1 ){
+         // Remove the 0 at the back.
+         ubig_value.pop_back();
+         // Set temp to the new back.
+         trim_temp = ubig_value.back();
+         // Go back to the start.
+      }      
+   } else if ( ubig_value.size() < 1 ){
+      // If the vector is empty, make it 0.
+      ubig_value.push_back(0);
    }
-   // At this point, t_r_vect should represent
-   // the correct value.
-   // return this = t_r_vect.
-   ubig_value = t_r_vect.ubig_value;
 
 }
 
@@ -616,7 +611,6 @@ ostream& operator<< (ostream& out, const ubigint& that) {
       // Print out the information at index iter.
       out << static_cast<char>(that.ubig_value[iter]+'0');
    }
-   //return out << "ubigint(" << that.uvalue << ")";
    return out;
 }
 
