@@ -12,8 +12,6 @@ using namespace std;
 #include "debug.h"
 
 ubigint::ubigint (unsigned long that){
-   DEBUGF ('~', this << " -> " << uvalue)
-
    // Turn the unsigned long that into individual numbers
    // to be passed into the ubigint.
    int temp = 0;
@@ -53,7 +51,6 @@ ubigint::ubigint (unsigned long that){
 }
 
 ubigint::ubigint (const string& that){
-   DEBUGF ('~', "that = \"" << that << "\"");
    for (char digit: that) {
       if (not isdigit (digit)) {
          throw invalid_argument ("ubigint::ubigint(" + that + ")");
@@ -84,9 +81,7 @@ ubigint::ubigint (const string& that){
 }
 
 ubigint ubigint::operator+ (const ubigint& that) const {
-   DEBUGF ('u', *this << "+" << that);
    ubigint result;
-   DEBUGF ('u', result);
 
    // Initializing variables.
    int carry = 0; // Initialized at 0.
@@ -249,7 +244,8 @@ ubigint ubigint::operator- (const ubigint& that) const {
    // depending on whether this or that is bigger than the other.
 
    // In the case where this > that
-   while ( this_is_bigger && iter <= that_size ){
+   // 444 - 88
+   while ( this_is_bigger && iter < that_size ){
       // while this > that, and iter does < that_size
       // Initialize a temporary result.
       int t_result = 0;
@@ -274,16 +270,25 @@ ubigint ubigint::operator- (const ubigint& that) const {
    // Push the remaining data from this onto the result.
    if ( this_is_bigger ){
       // Push the data ending at that.size onto result.
-      for ( int iter2 = that_size+1; iter2 < this_size; iter2++ ){
+      for ( int iter2 = that_size; iter2 < this_size; iter2++ ){
          // Push back the data
-         int temp = ubig_value[iter2];
+         int temp = ubig_value[iter2] + carry;
+         // Reset the carry
+         carry = 0;
+         // Check if temp < 0
+         if ( temp < 0 ) {
+            // set the carry to -1.
+            carry = -1;
+            // Add 10 to the result.
+            temp = temp + 10;
+         }
          result.ubig_value.push_back(temp);
       }
    }
    // Otherwise do nothing.
 
    // In the case where that > this
-   while ( that_is_bigger && iter <= this_size ){
+   while ( that_is_bigger && iter < this_size ){
       // while that > this, and iter < this_size
       // Initialize a temporary result.
       int t_result = 0;
@@ -308,9 +313,18 @@ ubigint ubigint::operator- (const ubigint& that) const {
    // Push the remaining data from that onto the result.
    if ( that_is_bigger ){
       // Push the data ending at that.size onto result.
-      for ( int iter2 = this_size+1; iter2 < that_size; iter2++ ){
+      for ( int iter2 = this_size; iter2 < that_size; iter2++ ){
          // Push back the data
-         int temp = that.ubig_value[iter2];
+         int temp = that.ubig_value[iter2] + carry;
+         // Reset the carry
+         carry = 0;
+         // Check if temp < 0
+         if ( temp < 0 ) {
+            // set the carry to -1.
+            carry = -1;
+            // Add 10 to the result.
+            temp = temp + 10;
+         }
          result.ubig_value.push_back(temp);
       }
    }
@@ -345,6 +359,12 @@ ubigint ubigint::operator* (const ubigint& that) const {
    int that_size = that.ubig_value.size(); // that.size()
    ubigint result; // resulting ubigint.
 
+   // 163 this
+   //  21 that
+   //  163
+   // 326x
+   
+
    // While loop #1.
    while ( order < that_size ){
       // While the order < that_size.
@@ -360,7 +380,7 @@ ubigint ubigint::operator* (const ubigint& that) const {
       }
 
       // While loop #2
-      while ( this_iter != this_size ){
+      while ( this_iter < this_size ){
          // while this_iter != this_size
 
          // Initialize required variables
@@ -369,6 +389,7 @@ ubigint ubigint::operator* (const ubigint& that) const {
          // Perform the multiplication, adding on a carry
          t_result = ubig_value[this_iter] * that.ubig_value[order]
          + carry;
+
          // Calculate the carry.
          carry = t_result / 10;
          // Set t_result to the remainder.
@@ -381,6 +402,16 @@ ubigint ubigint::operator* (const ubigint& that) const {
          // Loop back to the top
       }
 
+      // Check if the carry value >= 1.
+      // If it is, add the carry onto the result bigint vector.
+      if ( carry >= 1 ){
+         // Push carry onto t_vect
+         t_vect.ubig_value.push_back(carry);
+         // Reset carry
+         carry = 0;
+      }
+      // Otherwise, do nothing.
+
       // Outside of While loop #2, add the t_vect onto the result.
       result = result + t_vect;
       // Iterate the order by 1.
@@ -388,13 +419,6 @@ ubigint ubigint::operator* (const ubigint& that) const {
 
       // Loop back to the top.
    }
-   // Final operations.
-   // Check if the carry value >= 1.
-   // If it is, add the carry onto the result bigint vector.
-   if ( carry >= 1 ){
-      result.ubig_value.push_back(carry);
-   }
-   // Otherwise, do nothing.
    
    return result;
 }
@@ -639,6 +663,7 @@ ostream& operator<< (ostream& out, const ubigint& that) {
       if ( counter == 69 ){
          // If so, insert "\\n"
          out << "\\" << endl;
+         counter = 0;
       }
    }
    return out;

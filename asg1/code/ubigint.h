@@ -18,10 +18,6 @@ class ubigint {
    private:
 
       // Helper function for trimming zeros.
-      
-      // replace this later
-      using unumber = unsigned long;
-      unumber uvalue {};
 
       using udigit_t = unsigned char;
       using ubigvalue_t = vector<udigit_t>;
