@@ -271,6 +271,17 @@ ubigint ubigint::operator- (const ubigint& that) const {
       // Loop back to the top.
    }
 
+   // Push the remaining data from this onto the result.
+   if ( this_is_bigger ){
+      // Push the data ending at that.size onto result.
+      for ( int iter2 = that_size+1; iter2 < this_size; iter2++ ){
+         // Push back the data
+         int temp = ubig_value[iter2];
+         result.ubig_value.push_back(temp);
+      }
+   }
+   // Otherwise do nothing.
+
    // In the case where that > this
    while ( that_is_bigger && iter <= this_size ){
       // while that > this, and iter < this_size
@@ -294,6 +305,17 @@ ubigint ubigint::operator- (const ubigint& that) const {
       // Loop back to the top.
    }
 
+   // Push the remaining data from that onto the result.
+   if ( that_is_bigger ){
+      // Push the data ending at that.size onto result.
+      for ( int iter2 = this_size+1; iter2 < that_size; iter2++ ){
+         // Push back the data
+         int temp = that.ubig_value[iter2];
+         result.ubig_value.push_back(temp);
+      }
+   }
+   // Otherwise do nothing.
+
    // Trim the leading zeros in front of the first value.
    if ( result.ubig_value.size() > 1 && result.ubig_value.back() == 0 ){
       // If the vector is only one element, this will not run.
@@ -308,7 +330,7 @@ ubigint ubigint::operator- (const ubigint& that) const {
          // Set temp to the new back.
          trim_temp = result.ubig_value.back();
          // Go back to the start.
-      }      
+      }
    }
 
    // Return the result vector
@@ -607,9 +629,17 @@ bool ubigint::operator< (const ubigint& that) const {
 
 ostream& operator<< (ostream& out, const ubigint& that) {
    // Reverse iterate over that.ubig_value.
+   int counter = 0; // When this hits 69, insert "/\n"
    for (int iter = that.ubig_value.size()-1; iter >= 0; iter--){
       // Print out the information at index iter.
       out << static_cast<char>(that.ubig_value[iter]+'0');
+      // Iterate the counter.
+      counter = counter + 1;
+      // Check if the counter = 69.
+      if ( counter == 69 ){
+         // If so, insert "\\n"
+         out << "\\" << endl;
+      }
    }
    return out;
 }
