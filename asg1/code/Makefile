@@ -56,6 +56,9 @@ ${DEPSFILE} :
 again :
 	${GMAKE} spotless deps ci all lis
 
+submit :
+	submit cse111-wm.f20 asg1 ${ALLSOURCES} README
+
 ifeq (${NEEDINCL}, )
 include ${DEPSFILE}
 endif
