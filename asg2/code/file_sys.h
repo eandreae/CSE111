@@ -42,6 +42,7 @@ class inode_state {
       inode_state& operator= (const inode_state&) = delete; // op=
       inode_state();
       const string& prompt() const;
+      ~inode_state();
 };
 
 // class inode -
@@ -93,6 +94,7 @@ class base_file {
       virtual void remove (const string& filename);
       virtual inode_ptr mkdir (const string& dirname);
       virtual inode_ptr mkfile (const string& filename);
+      virtual void addEntry (const string& keyName, inode_ptr value);
 };
 
 // class plain_file -
@@ -148,6 +150,8 @@ class directory: public base_file {
       virtual void remove (const string& filename) override;
       virtual inode_ptr mkdir (const string& dirname) override;
       virtual inode_ptr mkfile (const string& filename) override;
+      virtual void addEntry (const string& keyName, inode_ptr value)
+         override;
 };
 
 #endif

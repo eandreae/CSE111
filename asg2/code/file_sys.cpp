@@ -28,6 +28,20 @@ ostream& operator<< (ostream& out, file_type type) {
 inode_state::inode_state() {
    DEBUGF ('i', "root = " << root << ", cwd = " << cwd
           << ", prompt = \"" << prompt() << "\"");
+   // Initialize the root directory.
+   root = make_shared<inode>(file_type::DIRECTORY_TYPE);
+   // Set CWD to root
+   cwd  = root;
+   // Populate the dirents with .
+   root->contents->addEntry(".", root);
+   // Populate the dirents with ..
+   root->contents->addEntry("..", root);
+
+}
+
+inode_state::~inode_state() {
+   // this calls another function, which calls another function, etc.
+   root->recursiveDestroy
 }
 
 const string& inode_state::prompt() const { return prompt_; }
@@ -80,6 +94,10 @@ inode_ptr base_file::mkfile (const string&) {
    throw file_error ("is a " + error_file_type());
 }
 
+void base_file::addEntry (const string&, inode_ptr) {
+   throw file_error ("is a " + error_file_type());
+}
+
 
 size_t plain_file::size() const {
    size_t size {0};
@@ -109,10 +127,17 @@ void directory::remove (const string& filename) {
 inode_ptr directory::mkdir (const string& dirname) {
    DEBUGF ('i', dirname);
    return nullptr;
+   // will put make_shared<inode>(...)
 }
 
 inode_ptr directory::mkfile (const string& filename) {
    DEBUGF ('i', filename);
+   cout << "oo yeah" << filename << endl;
    return nullptr;
+   // will put make_shared<inode>(...)
 }
 
+void directory::addEntry (const string& keyName, inode_ptr value) {
+   // Insert the key/value pair into the dirents map.
+   dirents[keyName] = value;
+}
