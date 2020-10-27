@@ -67,6 +67,7 @@ class inode {
    public:
       inode (file_type);
       int get_inode_nr() const;
+      virtual void recurseDestroy();
 };
 
 
@@ -95,6 +96,7 @@ class base_file {
       virtual inode_ptr mkdir (const string& dirname);
       virtual inode_ptr mkfile (const string& filename);
       virtual void addEntry (const string& keyName, inode_ptr value);
+      virtual void recurseDestroy();
 };
 
 // class plain_file -
@@ -152,6 +154,7 @@ class directory: public base_file {
       virtual inode_ptr mkfile (const string& filename) override;
       virtual void addEntry (const string& keyName, inode_ptr value)
          override;
+      virtual void recurseDestroy() override;
 };
 
 #endif

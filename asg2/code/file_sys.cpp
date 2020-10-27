@@ -41,7 +41,7 @@ inode_state::inode_state() {
 
 inode_state::~inode_state() {
    // this calls another function, which calls another function, etc.
-   root->recursiveDestroy
+   root->recurseDestroy();
 }
 
 const string& inode_state::prompt() const { return prompt_; }
@@ -62,6 +62,11 @@ inode::inode(file_type type): inode_nr (next_inode_nr++) {
            break;
    }
    DEBUGF ('i', "inode " << inode_nr << ", type = " << type);
+}
+
+void inode::recurseDestroy() {
+   contents->recurseDestroy();
+   contents = nullptr;
 }
 
 int inode::get_inode_nr() const {
@@ -96,6 +101,27 @@ inode_ptr base_file::mkfile (const string&) {
 
 void base_file::addEntry (const string&, inode_ptr) {
    throw file_error ("is a " + error_file_type());
+}
+
+void base_file::recurseDestroy() {
+   // Nothing needs to be done.
+}
+
+void directory::recurseDestroy() {
+   
+   for ( auto iter = dirents.begin(); iter != dirents.end(); iter++ ){
+      string file_name = iter->first;
+      inode_ptr ptr = iter->second;
+
+      if ( file_name == (".") || file_name == ("..") ){
+         // Do nothing
+      }
+      else {
+         // Perform recursion
+         ptr->recurseDestroy();
+      }
+   }
+   dirents.clear();
 }
 
 
