@@ -66,6 +66,10 @@ void fn_exit (inode_state& state, const wordvec& words){
 void fn_ls (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   // Get the working directory.
+   inode_ptr working_directory = state.get_cwd();
+   // Print the dirents of the working directory.
+   working_directory->get_contents()->printDirents();
 }
 
 void fn_lsr (inode_state& state, const wordvec& words){
@@ -81,7 +85,9 @@ void fn_make (inode_state& state, const wordvec& words){
 void fn_mkdir (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
-   // Make a directory inode
+   inode_ptr t_cwd = state.get_cwd();
+   t_cwd->get_contents()->mkdir(words[1]);
+   
 }
 
 void fn_prompt (inode_state& state, const wordvec& words){

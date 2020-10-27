@@ -36,12 +36,15 @@ inode_state::inode_state() {
    root->contents->addEntry(".", root);
    // Populate the dirents with ..
    root->contents->addEntry("..", root);
-
 }
 
 inode_state::~inode_state() {
    // this calls another function, which calls another function, etc.
    root->recurseDestroy();
+}
+
+inode_ptr inode_state::get_cwd() {
+   return cwd;
 }
 
 const string& inode_state::prompt() const { return prompt_; }
@@ -67,6 +70,10 @@ inode::inode(file_type type): inode_nr (next_inode_nr++) {
 void inode::recurseDestroy() {
    contents->recurseDestroy();
    contents = nullptr;
+}
+
+base_file_ptr inode::get_contents() {
+   return contents;
 }
 
 int inode::get_inode_nr() const {
@@ -107,6 +114,10 @@ void base_file::recurseDestroy() {
    // Nothing needs to be done.
 }
 
+void base_file::printDirents() {
+   // Nothing needs to be done.
+}
+
 void directory::recurseDestroy() {
    
    for ( auto iter = dirents.begin(); iter != dirents.end(); iter++ ){
@@ -140,6 +151,10 @@ void plain_file::writefile (const wordvec& words) {
    DEBUGF ('i', words);
 }
 
+bool plain_file::isDirectory() {
+   return is_directory;
+}
+
 size_t directory::size() const {
    size_t size {0};
    DEBUGF ('i', "size = " << size);
@@ -152,8 +167,18 @@ void directory::remove (const string& filename) {
 
 inode_ptr directory::mkdir (const string& dirname) {
    DEBUGF ('i', dirname);
-   return nullptr;
-   // will put make_shared<inode>(...)
+   // dirents[key] = value;
+   inode_ptr new_d = make_shared<inode>(file_type::DIRECTORY_TYPE);
+   // Get the contents of new_d.
+   base_file_ptr new_d_contents = new_d->get_contents();
+   // Add the dot and dotdot
+   new_d_contents->addEntry(".", new_d);
+   inode_ptr dotdot = dirents["."];
+   new_d_contents->addEntry("..", dotdot);
+   // Add the new directory to this.
+   addEntry(dirname, new_d);
+   // Return the new_d
+   return new_d;
 }
 
 inode_ptr directory::mkfile (const string& filename) {
@@ -166,4 +191,37 @@ inode_ptr directory::mkfile (const string& filename) {
 void directory::addEntry (const string& keyName, inode_ptr value) {
    // Insert the key/value pair into the dirents map.
    dirents[keyName] = value;
+}
+
+map<string,inode_ptr> directory::get_dirents() {
+   return dirents;
+}
+
+bool directory::isDirectory() {
+   return is_directory;
+}
+
+void directory::printDirents() {
+
+   for ( auto iter = dirents.begin(); iter != dirents.end(); iter++ ){
+      string file_name = iter->first;
+      inode_ptr ptr = iter->second;
+
+      if ( file_name == "." || file_name == ".." ){
+         // Do nothing for now.
+         cout << "printing " << file_name << endl;
+      }
+      else {
+         // Check if it is a directory
+         if ( is_directory ){
+            // If it is, print the name with the
+            // "/" at the end of the name.
+            cout << "   " << file_name << "/" << endl;
+         }
+         else {
+            // Otherwise, print the file name normally.
+            cout << "   " << file_name << endl;
+         }
+      }
+   }
 }

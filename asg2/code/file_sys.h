@@ -43,6 +43,7 @@ class inode_state {
       inode_state();
       const string& prompt() const;
       ~inode_state();
+      inode_ptr get_cwd();
 };
 
 // class inode -
@@ -68,6 +69,7 @@ class inode {
       inode (file_type);
       int get_inode_nr() const;
       virtual void recurseDestroy();
+      base_file_ptr get_contents();
 };
 
 
@@ -97,6 +99,8 @@ class base_file {
       virtual inode_ptr mkfile (const string& filename);
       virtual void addEntry (const string& keyName, inode_ptr value);
       virtual void recurseDestroy();
+      virtual bool isDirectory() = 0;
+      virtual void printDirents();
 };
 
 // class plain_file -
@@ -115,10 +119,12 @@ class plain_file: public base_file {
          static const string result = "plain file";
          return result;
       }
+      bool is_directory = false;
    public:
       virtual size_t size() const override;
       virtual const wordvec& readfile() const override;
       virtual void writefile (const wordvec& newdata) override;
+      virtual bool isDirectory() override;
 };
 
 // class directory -
@@ -147,6 +153,7 @@ class directory: public base_file {
          static const string result = "directory";
          return result;
       }
+      bool is_directory = true;
    public:
       virtual size_t size() const override;
       virtual void remove (const string& filename) override;
@@ -155,6 +162,9 @@ class directory: public base_file {
       virtual void addEntry (const string& keyName, inode_ptr value)
          override;
       virtual void recurseDestroy() override;
+      map<string,inode_ptr> get_dirents();
+      virtual void printDirents();
+      virtual bool isDirectory() override;
 };
 
 #endif
