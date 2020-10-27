@@ -48,6 +48,37 @@ void fn_cat (inode_state& state, const wordvec& words){
 void fn_cd (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   // Save the target word.
+   string target = words[1];
+   // Checker bool
+   bool target_found = false;
+   // Get the current working directory.
+   inode_ptr working_directory = state.get_cwd();
+   // Get the contents of the working directory.
+   base_file_ptr w_d_contents = working_directory->get_contents();
+   // Get the dirents of the contents.
+   map<string,inode_ptr> w_d_dirents = w_d_contents->get_dirents();
+   // Search through the dirents for a match
+   for (auto iter = w_d_dirents.begin(); iter != w_d_dirents.end();
+      ++iter){
+      // Initialize variables.
+      string file_name = iter->first;
+      inode_ptr ptr = iter->second;
+      // Check if the file_name matches with the target.
+      if ( file_name == target ){
+         // If there is a match, set the cwd to ptr.
+         state.set_cwd(ptr);
+         // Iterate the checker variable.
+         target_found = true;
+      }
+      else {
+         // No match, keep looking.
+      }
+   }
+   if ( target_found == false ){
+      cout << target << " could not be found" << endl;
+   }
+      
 }
 
 void fn_echo (inode_state& state, const wordvec& words){
@@ -68,6 +99,16 @@ void fn_ls (inode_state& state, const wordvec& words){
    DEBUGF ('c', words);
    // Get the working directory.
    inode_ptr working_directory = state.get_cwd();
+   // Print the path
+   if ( state.get_root() == state.get_cwd() ){
+      // If root == cwd, then print "/:"
+      cout << "/:" << endl;
+   }
+   else {
+      // Print the path
+      // Not implemented.
+      state.print_path();
+   }
    // Print the dirents of the working directory.
    working_directory->get_contents()->printDirents();
 }

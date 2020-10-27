@@ -44,6 +44,9 @@ class inode_state {
       const string& prompt() const;
       ~inode_state();
       inode_ptr get_cwd();
+      inode_ptr get_root();
+      void set_cwd(inode_ptr new_cwd);
+      void print_path();
 };
 
 // class inode -
@@ -101,6 +104,7 @@ class base_file {
       virtual void recurseDestroy();
       virtual bool isDirectory() = 0;
       virtual void printDirents();
+      virtual map<string,inode_ptr> get_dirents();
 };
 
 // class plain_file -
@@ -162,7 +166,7 @@ class directory: public base_file {
       virtual void addEntry (const string& keyName, inode_ptr value)
          override;
       virtual void recurseDestroy() override;
-      map<string,inode_ptr> get_dirents();
+      virtual map<string,inode_ptr> get_dirents() override;
       virtual void printDirents();
       virtual bool isDirectory() override;
 };

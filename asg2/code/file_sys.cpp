@@ -47,6 +47,38 @@ inode_ptr inode_state::get_cwd() {
    return cwd;
 }
 
+inode_ptr inode_state::get_root() {
+   return root;
+}
+
+void inode_state::set_cwd(inode_ptr new_cwd){
+   cwd = new_cwd;
+}
+
+void inode_state::print_path() {
+   string output = "/";
+   // Get the root's contents
+   base_file_ptr root_contents = root->get_contents();
+   // Get the root's dirents
+   map<string,inode_ptr> r_dirents = root_contents->get_dirents();
+   // Iterate over the root_dirents in search of the cwd.
+   for (auto iter = r_dirents.begin(); iter != r_dirents.end();
+   iter++){
+      string file_name = iter->first;
+      inode_ptr ptr = iter->second;
+      // Check if the root's dirent's inode_ptr = the cwd.
+      if ( ptr == cwd ){
+         // If so, this is the path, print it.
+         output += file_name;
+      }
+      else {
+         // Do nothing.
+      }
+   }
+   output += ":";
+   cout << output << endl;
+}
+
 const string& inode_state::prompt() const { return prompt_; }
 
 ostream& operator<< (ostream& out, const inode_state& state) {
@@ -116,6 +148,12 @@ void base_file::recurseDestroy() {
 
 void base_file::printDirents() {
    // Nothing needs to be done.
+}
+
+map<string,inode_ptr> base_file::get_dirents() {
+   // Nothing needs to be done.
+   map<string,inode_ptr> dummy;
+   return dummy;
 }
 
 void directory::recurseDestroy() {
