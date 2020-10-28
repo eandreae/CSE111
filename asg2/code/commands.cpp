@@ -48,37 +48,50 @@ void fn_cat (inode_state& state, const wordvec& words){
 void fn_cd (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
-   // Save the target word.
-   string target = words[1];
-   // Checker bool
-   bool target_found = false;
-   // Get the current working directory.
-   inode_ptr working_directory = state.get_cwd();
-   // Get the contents of the working directory.
-   base_file_ptr w_d_contents = working_directory->get_contents();
-   // Get the dirents of the contents.
-   map<string,inode_ptr> w_d_dirents = w_d_contents->get_dirents();
-   // Search through the dirents for a match
-   for (auto iter = w_d_dirents.begin(); iter != w_d_dirents.end();
-      ++iter){
-      // Initialize variables.
-      string file_name = iter->first;
-      inode_ptr ptr = iter->second;
-      // Check if the file_name matches with the target.
-      if ( file_name == target ){
-         // If there is a match, set the cwd to ptr.
-         state.set_cwd(ptr);
-         // Iterate the checker variable.
-         target_found = true;
+   if ( words.size() < 2 ){
+      state.set_cwd(state.get_root());
+   }
+   else {
+      // Save the target word.
+      string target = words[1];
+      // Split the target word into a wordvec.
+      wordvec split_result = split(target, "/");
+      cout << "split_result = " << split_result << endl;
+      // Checker bool, for later.
+      bool target_found = false;
+      // Get the current working directory, store it in a
+      // temporary directory for iteration.
+      inode_ptr temp_directory = state.get_cwd();
+      // Iterate through split_result, until the end of it.
+      // Checking if the directories exist on the way.
+      for(unsigned int iter = 0; iter < split_result.size(); iter++){
+         // Get the contents of the temp_directory.
+         base_file_ptr temp_contents = temp_directory->get_contents();
+         // Check if the dirents have split_result[0-size()-1].
+         inode_ptr dirent_check = temp_contents->check_dirents(
+            split_result[iter]);
+         // Check if dirent_check is null.
+         if ( dirent_check != nullptr ){
+            // If it is not null, set the new temp_directory to it.
+            temp_directory = dirent_check;
+            // Check if iter = split_result.size()-1
+            if ( iter == (split_result.size()-1) ){
+               // It has reached the end of the wordvec,
+               // Therefore the target has been found.
+               target_found = true;
+            }
+         }
+      }
+      // Outside of the for loop, check if the target was found.
+      if ( target_found ) {
+         // Set the cwd to temp_directory.
+         state.set_cwd(temp_directory);
       }
       else {
-         // No match, keep looking.
+         // Print error message.
+         cout << target << ": Does not exist" << endl;
       }
-   }
-   if ( target_found == false ){
-      cout << target << " could not be found" << endl;
-   }
-      
+   }  
 }
 
 void fn_echo (inode_state& state, const wordvec& words){

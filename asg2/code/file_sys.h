@@ -105,6 +105,7 @@ class base_file {
       virtual bool isDirectory() = 0;
       virtual void printDirents();
       virtual map<string,inode_ptr> get_dirents();
+      virtual inode_ptr check_dirents(string& filename);
 };
 
 // class plain_file -
@@ -169,6 +170,7 @@ class directory: public base_file {
       virtual map<string,inode_ptr> get_dirents() override;
       virtual void printDirents();
       virtual bool isDirectory() override;
+      virtual inode_ptr check_dirents(string& filename) override;
 };
 
 #endif

@@ -156,6 +156,11 @@ map<string,inode_ptr> base_file::get_dirents() {
    return dummy;
 }
 
+inode_ptr base_file::check_dirents(string&) {
+   // Nothing needs to be done.
+   return nullptr;
+}
+
 void directory::recurseDestroy() {
    
    for ( auto iter = dirents.begin(); iter != dirents.end(); iter++ ){
@@ -247,7 +252,7 @@ void directory::printDirents() {
 
       if ( file_name == "." || file_name == ".." ){
          // Do nothing for now.
-         cout << "printing " << file_name << endl;
+         cout << "   " << file_name << endl;
       }
       else {
          // Check if it is a directory
@@ -262,4 +267,24 @@ void directory::printDirents() {
          }
       }
    }
+}
+
+inode_ptr directory::check_dirents(string& filename){
+   // iterate through this directory to see if filename is
+   // a member of its dirents.
+   string target = filename;
+
+   for(auto iter = dirents.begin(); iter != dirents.end(); iter++){
+      string file_name = iter->first;
+      inode_ptr ptr = iter->second;
+
+      if( file_name == target ){
+         return iter->second;
+      }
+      else {
+         // Keep iterating.
+      }
+   }
+   // Return nullptr
+   return nullptr;
 }
