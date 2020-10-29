@@ -55,28 +55,63 @@ void inode_state::set_cwd(inode_ptr new_cwd){
    cwd = new_cwd;
 }
 
-void inode_state::print_path() {
-   string output = "/";
-   // Get the root's contents
-   base_file_ptr root_contents = root->get_contents();
-   // Get the root's dirents
-   map<string,inode_ptr> r_dirents = root_contents->get_dirents();
-   // Iterate over the root_dirents in search of the cwd.
-   for (auto iter = r_dirents.begin(); iter != r_dirents.end();
-   iter++){
-      string file_name = iter->first;
-      inode_ptr ptr = iter->second;
-      // Check if the root's dirent's inode_ptr = the cwd.
-      if ( ptr == cwd ){
-         // If so, this is the path, print it.
-         output += file_name;
-      }
-      else {
-         // Do nothing.
+void inode_state::print_path(wordvec path_names) {
+   
+   for(int iter = path_names.size()-1; iter != -1; iter--){
+      // Pop path_names, storing and printing the string.
+      string result = path_names[iter];
+      cout << result;
+      if ( iter != 0 && result != "/"){
+         cout << "/";
       }
    }
-   output += ":";
-   cout << output << endl;
+   // Once finished printing the path, add the semicolon.
+   cout << ":" << endl;
+}
+
+wordvec inode_state::get_path() {
+   // Get the working directory.
+   inode_ptr working_directory = this->get_cwd();
+   // Print the path
+   // Iterate through the parents of the cwd, pushing back
+   // the names of the directories onto a wordvec.
+   wordvec path_names;
+   while ( working_directory != this->get_root() ){
+      // Get the contents of the working directory.
+      base_file_ptr wd_contents = working_directory->get_contents();
+      // Get the parent of the working directory inode.
+      inode_ptr parent = wd_contents->get_parent_inode();
+      // Get the contents of the parent inode
+      base_file_ptr p_contents = parent->get_contents();
+      // Get the dirents of the parent's contents.
+      map<string,inode_ptr> p_dirents = p_contents->get_dirents();
+      // Iterate through the parent's dirents, looking for
+      // when one of the parent's dirents is equal to
+      // the current working directory.
+      for(auto iter = p_dirents.begin(); iter != p_dirents.end();
+         iter++){
+         // Store the needed temp values
+         string file_name = iter->first;
+         inode_ptr ptr = iter->second;
+         // Check if ptr is the cwd.
+         if ( ptr == working_directory ){
+            // push the file_name string back onto the wordvec.
+            path_names.push_back(file_name);
+         }
+         // Keep iterating.
+      }
+      // Outside of the for loop, set the working_directory to the
+      // parent inode.
+      working_directory = parent;
+   }
+
+   if ( working_directory == this->get_root() ){
+      // Push back "/" onto the wordvec.
+      path_names.push_back("/");
+   }
+   
+   // return the path_names wordvec
+   return path_names;
 }
 
 const string& inode_state::prompt() const { return prompt_; }
@@ -198,6 +233,11 @@ bool plain_file::isDirectory() {
    return is_directory;
 }
 
+inode_ptr plain_file::get_parent_inode() {
+   inode_ptr dummy;
+   return dummy;
+}
+
 size_t directory::size() const {
    size_t size {0};
    DEBUGF ('i', "size = " << size);
@@ -287,4 +327,10 @@ inode_ptr directory::check_dirents(string& filename){
    }
    // Return nullptr
    return nullptr;
+}
+
+inode_ptr directory::get_parent_inode() {
+   // Save the inode_ptr of the parent of this directory.
+   inode_ptr parent = dirents[".."];
+   return parent;
 }

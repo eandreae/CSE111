@@ -46,7 +46,8 @@ class inode_state {
       inode_ptr get_cwd();
       inode_ptr get_root();
       void set_cwd(inode_ptr new_cwd);
-      void print_path();
+      void print_path(wordvec path_names);
+      wordvec get_path();
 };
 
 // class inode -
@@ -106,6 +107,7 @@ class base_file {
       virtual void printDirents();
       virtual map<string,inode_ptr> get_dirents();
       virtual inode_ptr check_dirents(string& filename);
+      virtual inode_ptr get_parent_inode() = 0;
 };
 
 // class plain_file -
@@ -130,6 +132,7 @@ class plain_file: public base_file {
       virtual const wordvec& readfile() const override;
       virtual void writefile (const wordvec& newdata) override;
       virtual bool isDirectory() override;
+      virtual inode_ptr get_parent_inode() override;
 };
 
 // class directory -
@@ -171,6 +174,7 @@ class directory: public base_file {
       virtual void printDirents();
       virtual bool isDirectory() override;
       virtual inode_ptr check_dirents(string& filename) override;
+      virtual inode_ptr get_parent_inode() override;
 };
 
 #endif
