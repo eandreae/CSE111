@@ -734,6 +734,14 @@ void fn_mkdir (inode_state& state, const wordvec& words){
 void fn_prompt (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+
+   string output = "";
+   for(unsigned int iter = 1; iter != words.size(); iter++){
+      output.append(words[iter]);
+      output.append(" ");
+   }
+
+   state.set_prompt(output);
 }
 
 void fn_pwd (inode_state& state, const wordvec& words){
@@ -748,6 +756,15 @@ void fn_pwd (inode_state& state, const wordvec& words){
 void fn_rm (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+   if ( words.size() < 2 ){
+      // Print error.
+      cout << "rm: missing operand" << endl;
+   }
+   else {
+      for(unsigned int w_iter = 1; w_iter != words.size(); w_iter++){
+         state.get_cwd()->get_contents()->remove(state, words[w_iter]);
+      }
+   }
 }
 
 void fn_rmr (inode_state& state, const wordvec& words){

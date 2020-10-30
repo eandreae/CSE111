@@ -128,6 +128,10 @@ wordvec inode_state::get_path() {
    return path_names;
 }
 
+void inode_state::set_prompt(string& input) {
+   prompt_ = input;
+}
+
 const string& inode_state::prompt() const { return prompt_; }
 
 ostream& operator<< (ostream& out, const inode_state& state) {
@@ -153,6 +157,16 @@ void inode::recurseDestroy() {
    contents = nullptr;
 }
 
+size_t inode::get_next_inode_nr(){
+   return next_inode_nr;
+}
+
+void inode::decrement_next_inode_nr(){
+   size_t new_number = this->get_next_inode_nr();
+   new_number = new_number - 1;
+   next_inode_nr = new_number;
+}
+
 base_file_ptr inode::get_contents() {
    return contents;
 }
@@ -175,7 +189,7 @@ void base_file::writefile (const wordvec&) {
    throw file_error ("is a " + error_file_type());
 }
 
-void base_file::remove (const string&) {
+void base_file::remove (inode_state&, const string&) {
    throw file_error ("is a " + error_file_type());
 }
 
@@ -239,6 +253,10 @@ size_t plain_file::size() const {
 
    total_size += data.size()-1;
 
+   if ( data.size() == 0 ) {
+      total_size = 0;
+   }
+
    return total_size;
 }
 
@@ -275,8 +293,13 @@ size_t directory::size() const {
    return size;
 }
 
-void directory::remove (const string& filename) {
+void directory::remove (inode_state& state, const string& filename) {
    DEBUGF ('i', filename);
+   auto target = dirents.find(filename);
+   if ( target != dirents.end() ){
+      dirents.erase(target);
+      state.get_cwd()->decrement_next_inode_nr();
+   }
 }
 
 inode_ptr directory::mkdir (const string& dirname) {

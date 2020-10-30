@@ -49,6 +49,7 @@ class inode_state {
       void print_path(wordvec path_names);
       void print_path_pwd(wordvec path_names);
       wordvec get_path();
+      void set_prompt(string& input);
 };
 
 // class inode -
@@ -75,6 +76,8 @@ class inode {
       int get_inode_nr() const;
       virtual void recurseDestroy();
       base_file_ptr get_contents();
+      size_t get_next_inode_nr();
+      void decrement_next_inode_nr();
 };
 
 
@@ -99,7 +102,7 @@ class base_file {
       virtual size_t size() const = 0;
       virtual const wordvec& readfile() const;
       virtual void writefile (const wordvec& newdata);
-      virtual void remove (const string& filename);
+      virtual void remove (inode_state& state, const string& filename);
       virtual inode_ptr mkdir (const string& dirname);
       virtual inode_ptr mkfile (const string& filename);
       virtual void addEntry (const string& keyName, inode_ptr value);
@@ -165,7 +168,8 @@ class directory: public base_file {
       bool is_directory = true;
    public:
       virtual size_t size() const override;
-      virtual void remove (const string& filename) override;
+      virtual void remove (inode_state& state, const string& filename) 
+         override;
       virtual inode_ptr mkdir (const string& dirname) override;
       virtual inode_ptr mkfile (const string& filename) override;
       virtual void addEntry (const string& keyName, inode_ptr value)
