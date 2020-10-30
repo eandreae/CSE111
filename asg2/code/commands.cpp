@@ -146,7 +146,7 @@ void fn_cat (inode_state& state, const wordvec& words){
 void fn_cd (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
-   if ( words.size() < 2 ){
+   if ( words.size() < 2 || words[1] == "/" ){
       state.set_cwd(state.get_root());
    }
    else {
@@ -310,9 +310,7 @@ void fn_ls (inode_state& state, const wordvec& words){
             }
             else {
                // Otherwise, it is a filename.
-               // Search for it in the root directory.
-               // Set the cwd to root
-               state.set_cwd(state.get_root());
+               // Search for it in the current directory.
                // Check the cwd for split_result[0].
                inode_ptr exists = state.get_cwd()->get_contents()
                ->check_dirents(split_result[0]);
@@ -321,19 +319,21 @@ void fn_ls (inode_state& state, const wordvec& words){
                   // print error message.
                }
                else {
-                  // The directory exists.
-                  // Set the cwd to exists.
-                  state.set_cwd(exists);
-                  // Get the path of cwd.
-                  path_names = state.get_path();
-                  // Print the path
-                  state.print_path(path_names);
-                  // Print the dirents of the cwd.
-                  state.get_cwd()->get_contents()->printDirents();
-                  // Set the cwd back to the original cwd.
-                  state.set_cwd(original_cwd);
-                  // Set target_found to true.
-                  target_found = true;
+                  // Check if exists is a directory.
+                  if ( exists->get_contents()->isDirectory() ){
+                     // Set the cwd to exists.
+                     state.set_cwd(exists);
+                     // Get the path of cwd.
+                     path_names = state.get_path();
+                     // Print the path
+                     state.print_path(path_names);
+                     // Print the dirents of the cwd.
+                     state.get_cwd()->get_contents()->printDirents();
+                     // Set the cwd back to the original cwd.
+                     state.set_cwd(original_cwd);
+                     // Set target_found to true.
+                     target_found = true;
+                  }
                }
             }
          }
@@ -350,14 +350,16 @@ void fn_ls (inode_state& state, const wordvec& words){
                   split_result[iter]);
                // Check if dirent_check is null.
                if ( dirent_check != nullptr ){
-                  // If it is not null, set the new 
-                  // temp_directory to it.
-                  temp_directory = dirent_check;
-                  // Check if iter = split_result.size()-1
-                  if ( iter == (split_result.size()-1) ){
-                     // It has reached the end of the wordvec,
-                     // Therefore the target has been found.
-                     target_found = true;
+                  // Check if dirent_check is a directory.
+                  if ( dirent_check->get_contents()->isDirectory() ){
+                     // Set temp_directory to it.
+                     temp_directory = dirent_check;
+                     // Check if iter = split_result.size()-1
+                     if ( iter == (split_result.size()-1) ){
+                        // It has reached the end of the wordvec,
+                        // Therefore the target has been found.
+                        target_found = true;
+                     }
                   }
                }
             }
@@ -391,7 +393,206 @@ void fn_lsr (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
    
+   // Remember the base cwd
+   inode_ptr original_cwd = state.get_cwd();
+   // Store an empty wordvec.
+   wordvec empty;
+   
+   if ( words.size() < 2 ){
+      // if "lsr" is called by itself
+      // Run lsr on the current state.
+      lsr_recursion_root(state, words);
+      // Set the cwd to the original cwd.
+      state.set_cwd(original_cwd);
+   }
+   // Otherwise, continue the program.
+
+   // Set up an error string path
+   // Iterate through the wordvec
+   for(unsigned int w_iter = 1; w_iter < words.size(); w_iter++){
+      // Save the target word.
+      string target = words[w_iter];
+      // Split the target word into a wordvec.
+      wordvec split_result;
+      if ( target != "/" ){
+         split_result = split(target, "/");
+      }
+      else {
+         split_result.push_back("/");
+      }
+      // Checker bool, for later.
+      bool target_found = false;
+      // Get the current working directory, store it in a
+      // temporary directory for iteration.
+      inode_ptr temp_directory = state.get_cwd();
+      // Check if the split_result is size 1.
+         if ( split_result.size() == 1 ){
+         // if it is size 1, there are many different cases.
+         // "/", ".", "..", "filename"
+
+         // Case 1: "/"
+         if ( split_result[0] == "/" ){
+            // Do an lsr of the root.
+            // set the cwd to root.
+            state.set_cwd(state.get_root());
+            // Perform the recursion
+            lsr_recursion_root(state, empty);
+            // Return the cwd to the original wd.
+            state.set_cwd(original_cwd);
+            // Set target_found to true.
+            target_found = true;
+         }
+         // Case 2: "."
+         else if ( split_result[0] == "." ){
+            // Do an lsr of itself.
+            // Perform recursion on itself.
+            lsr_recursion_root(state, empty);
+            // Set the cwd back to the original cwd.
+            state.set_cwd(original_cwd);
+            // Set target_found to true.
+            target_found = true;
+         }
+         // Case 3: ".."
+         else if ( split_result[0] == ".." ){
+            // Do an lsr of its parent
+            // Get the parent inode of the cwd.
+            inode_ptr parent = state.get_cwd()->get_contents()
+            ->get_parent_inode();
+            // Change the cwd to the parent of the cwd.
+            state.set_cwd(parent);
+            // Perform recursion
+            lsr_recursion_root(state, empty);
+            // Set the cwd back to the original cwd.
+            state.set_cwd(original_cwd);
+            // Set target_found to true.
+            target_found = true;
+         }
+         else {
+            // Otherwise, it is a filename.
+            // Search for it in the current directory.
+            // Check the cwd for split_result[0].
+            inode_ptr exists = state.get_cwd()->get_contents()
+            ->check_dirents(split_result[0]);
+            // check if "exists" is nullptr.
+            if ( exists == nullptr ){
+               // print error message.
+            }
+            else {
+               // Check if exists is a directory.
+               if ( exists->get_contents()->isDirectory() ){
+                  // Set the cwd to exists.
+                  state.set_cwd(exists);
+                  // Perform recursion
+                  lsr_recursion_root(state, empty);
+                  // Reset the cwd.
+                  state.set_cwd(original_cwd);
+                  // Set target_found to true.
+                  target_found = true;
+               }
+            }
+         }
+      }
+      else {
+         // Iterate through split_result, until the end of it.
+         // Checking if the directories exist on the way.
+         for(unsigned int iter = 0; iter < split_result.size(); 
+            iter++){
+            // Get the contents of the temp_directory.
+            base_file_ptr temp_contents = temp_directory
+               ->get_contents();
+            // Check if the dirents have split_result[0-size()-1].
+            inode_ptr dirent_check = temp_contents->check_dirents(
+               split_result[iter]);
+            // Check if dirent_check is null.
+            if ( dirent_check != nullptr ){
+               // Check if dirent_check is a directory.
+               if ( dirent_check->get_contents()->isDirectory() ){
+                  // Set temp_directory to it.
+                  temp_directory = dirent_check;
+                  // Check if iter = split_result.size()-1
+                  if ( iter == (split_result.size()-1) ){
+                     // It has reached the end of the wordvec,
+                     // Therefore the target has been found.
+                     target_found = true;
+                  }
+               }
+            }
+         }
+         if ( target_found ){
+            // Set the cwd to the temp_directory
+            state.set_cwd(temp_directory);
+            // Perform recusrion.
+            lsr_recursion_root(state, empty);
+            // Reset cwd.
+            state.set_cwd(original_cwd);
+         }
+      }
+      // Outside of the for loop, check if the target was found.
+      if ( target_found ) {
+         // Do nothing
+      }
+      else {
+         // Break out of the for loop
+         cout << words[w_iter] << ": Does not exist" << endl;
+      }
+   }
+}
+
+void lsr_recursion_root (inode_state& state, const wordvec& words) {
+   // Print current directory.
    fn_ls(state, words);
+
+   //Scan through the dirents for a directory.
+   map<string,inode_ptr> dirents = state.get_cwd()->get_contents()
+   ->get_dirents();
+
+   for(auto iter = dirents.begin(); iter != dirents.end(); iter++){
+      string file_name = iter->first;
+      inode_ptr ptr = iter->second;
+      // Check if the ptr is a directory.
+      if( file_name == "." || file_name == ".." ){
+         // Do nothing.
+      }
+      else {
+         // Check if the ptr is a directory.
+         if ( ptr->get_contents()->isDirectory() ){
+            // Set the cwd to ptr.
+            state.set_cwd(ptr);
+            // lsr on the new state.
+            lsr_recursion_root(state, words);
+         }
+      }
+   }
+}
+
+void lsr_recursion (inode_state& state, const wordvec& words) {
+
+   fn_pwd(state, words);
+
+   //Scan through the dirents for a directory.
+   map<string,inode_ptr> dirents = state.get_cwd()->get_contents()
+   ->get_dirents();
+
+   for(auto iter = dirents.begin(); iter != dirents.end(); iter++){
+      string file_name = iter->first;
+      inode_ptr ptr = iter->second;
+      // Check if the ptr is a directory.
+      if( file_name == "." || file_name == ".." ){
+         // Do nothing.
+      }
+      else {
+         // Check if the ptr is a directory.
+         cout << file_name << endl;
+         if ( ptr->get_contents()->isDirectory() ){
+            // Set the cwd to ptr.
+            state.set_cwd(ptr);
+            // lsr on the new state.
+            fn_pwd(state, words);
+            fn_ls(state, words);
+            lsr_recursion(state, words);
+         }
+      }
+   }
 }
 
 void fn_make (inode_state& state, const wordvec& words){

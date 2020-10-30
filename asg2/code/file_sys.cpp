@@ -237,6 +237,8 @@ size_t plain_file::size() const {
       total_size += temp.length();
    }
 
+   total_size += data.size()-1;
+
    return total_size;
 }
 
@@ -325,19 +327,24 @@ void directory::printDirents() {
       inode_ptr ptr = iter->second;
 
       if ( file_name == "." || file_name == ".." ){
-         // Do nothing for now.
-         cout << "   " << file_name << endl;
+         cout << "   " << ptr->get_inode_nr() << "        "
+         << ptr->get_contents()->size() << "  " << file_name
+         << "/" << endl;
       }
       else {
          // Check if it is a directory
          if ( ptr->get_contents()->isDirectory() ){
             // If it is, print the name with the
             // "/" at the end of the name.
-            cout << "   " << file_name << "/" << endl;
+            cout << "   " << ptr->get_inode_nr() << "        "
+            << ptr->get_contents()->size() << "  " << file_name
+            << "/" << endl;
          }
          else {
             // Otherwise, print the file name normally.
-            cout << "   " << file_name << endl;
+            cout << "   " << ptr->get_inode_nr() << "        "
+            << ptr->get_contents()->size() << "  " << file_name
+            << endl;
          }
       }
    }
