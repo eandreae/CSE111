@@ -24,7 +24,6 @@ class command_error: public runtime_error {
 };
 
 // helper functions for lsr
-void lsr_recursion_root (inode_state& state, const wordvec& words);
 void lsr_recursion (inode_state& state, const wordvec& words);
 
 // execution functions -

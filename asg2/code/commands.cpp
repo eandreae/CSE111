@@ -401,7 +401,7 @@ void fn_lsr (inode_state& state, const wordvec& words){
    if ( words.size() < 2 ){
       // if "lsr" is called by itself
       // Run lsr on the current state.
-      lsr_recursion_root(state, words);
+      lsr_recursion(state, words);
       // Set the cwd to the original cwd.
       state.set_cwd(original_cwd);
    }
@@ -436,7 +436,7 @@ void fn_lsr (inode_state& state, const wordvec& words){
             // set the cwd to root.
             state.set_cwd(state.get_root());
             // Perform the recursion
-            lsr_recursion_root(state, empty);
+            lsr_recursion(state, empty);
             // Return the cwd to the original wd.
             state.set_cwd(original_cwd);
             // Set target_found to true.
@@ -446,7 +446,7 @@ void fn_lsr (inode_state& state, const wordvec& words){
          else if ( split_result[0] == "." ){
             // Do an lsr of itself.
             // Perform recursion on itself.
-            lsr_recursion_root(state, empty);
+            lsr_recursion(state, empty);
             // Set the cwd back to the original cwd.
             state.set_cwd(original_cwd);
             // Set target_found to true.
@@ -461,7 +461,7 @@ void fn_lsr (inode_state& state, const wordvec& words){
             // Change the cwd to the parent of the cwd.
             state.set_cwd(parent);
             // Perform recursion
-            lsr_recursion_root(state, empty);
+            lsr_recursion(state, empty);
             // Set the cwd back to the original cwd.
             state.set_cwd(original_cwd);
             // Set target_found to true.
@@ -483,7 +483,7 @@ void fn_lsr (inode_state& state, const wordvec& words){
                   // Set the cwd to exists.
                   state.set_cwd(exists);
                   // Perform recursion
-                  lsr_recursion_root(state, empty);
+                  lsr_recursion(state, empty);
                   // Reset the cwd.
                   state.set_cwd(original_cwd);
                   // Set target_found to true.
@@ -522,7 +522,7 @@ void fn_lsr (inode_state& state, const wordvec& words){
             // Set the cwd to the temp_directory
             state.set_cwd(temp_directory);
             // Perform recusrion.
-            lsr_recursion_root(state, empty);
+            lsr_recursion(state, empty);
             // Reset cwd.
             state.set_cwd(original_cwd);
          }
@@ -538,7 +538,7 @@ void fn_lsr (inode_state& state, const wordvec& words){
    }
 }
 
-void lsr_recursion_root (inode_state& state, const wordvec& words) {
+void lsr_recursion (inode_state& state, const wordvec& words) {
    // Print current directory.
    fn_ls(state, words);
 
@@ -559,36 +559,6 @@ void lsr_recursion_root (inode_state& state, const wordvec& words) {
             // Set the cwd to ptr.
             state.set_cwd(ptr);
             // lsr on the new state.
-            lsr_recursion_root(state, words);
-         }
-      }
-   }
-}
-
-void lsr_recursion (inode_state& state, const wordvec& words) {
-
-   fn_pwd(state, words);
-
-   //Scan through the dirents for a directory.
-   map<string,inode_ptr> dirents = state.get_cwd()->get_contents()
-   ->get_dirents();
-
-   for(auto iter = dirents.begin(); iter != dirents.end(); iter++){
-      string file_name = iter->first;
-      inode_ptr ptr = iter->second;
-      // Check if the ptr is a directory.
-      if( file_name == "." || file_name == ".." ){
-         // Do nothing.
-      }
-      else {
-         // Check if the ptr is a directory.
-         cout << file_name << endl;
-         if ( ptr->get_contents()->isDirectory() ){
-            // Set the cwd to ptr.
-            state.set_cwd(ptr);
-            // lsr on the new state.
-            fn_pwd(state, words);
-            fn_ls(state, words);
             lsr_recursion(state, words);
          }
       }
