@@ -69,6 +69,20 @@ void inode_state::print_path(wordvec path_names) {
    cout << ":" << endl;
 }
 
+void inode_state::print_path_pwd(wordvec path_names) {
+   
+   for(int iter = path_names.size()-1; iter != -1; iter--){
+      // Pop path_names, storing and printing the string.
+      string result = path_names[iter];
+      cout << result;
+      if ( iter != 0 && result != "/"){
+         cout << "/";
+      }
+   }
+   // Once done, print newline.
+   cout << endl;
+}
+
 wordvec inode_state::get_path() {
    // Get the working directory.
    inode_ptr working_directory = this->get_cwd();
@@ -215,9 +229,15 @@ void directory::recurseDestroy() {
 
 
 size_t plain_file::size() const {
-   size_t size {0};
-   DEBUGF ('i', "size = " << size);
-   return size;
+   string temp;
+   int total_size = 0;
+
+   for ( unsigned int iter = 0; iter < data.size(); iter++ ){
+      temp = data[iter];
+      total_size += temp.length();
+   }
+
+   return total_size;
 }
 
 const wordvec& plain_file::readfile() const {
@@ -227,6 +247,15 @@ const wordvec& plain_file::readfile() const {
 
 void plain_file::writefile (const wordvec& words) {
    DEBUGF ('i', words);
+   // Iterate through the wordvec, ignoring positions 0 and 1.
+   if ( words.size() < 3 ){
+      // If there were no words given.
+      // Do nothing for now
+   }
+   for(unsigned int iter = 2; iter != words.size(); iter++ ){
+      // push the words[iter] back onto the data wordvec.
+      data.push_back(words[iter]);
+   }
 }
 
 bool plain_file::isDirectory() {
@@ -239,8 +268,8 @@ inode_ptr plain_file::get_parent_inode() {
 }
 
 size_t directory::size() const {
-   size_t size {0};
-   DEBUGF ('i', "size = " << size);
+   int size = 0;
+   size = dirents.size();
    return size;
 }
 
@@ -266,9 +295,14 @@ inode_ptr directory::mkdir (const string& dirname) {
 
 inode_ptr directory::mkfile (const string& filename) {
    DEBUGF ('i', filename);
-   cout << "oo yeah" << filename << endl;
-   return nullptr;
-   // will put make_shared<inode>(...)
+   // Make a plain_file inode.
+   inode_ptr new_f = make_shared<inode>(file_type::PLAIN_TYPE);
+   // Get the current directory.
+   inode_ptr curr_d = dirents["."];
+   // Add the new file to the directory.
+   curr_d->get_contents()->addEntry(filename, new_f);
+   // return the new file ptr.
+   return new_f;
 }
 
 void directory::addEntry (const string& keyName, inode_ptr value) {
@@ -296,7 +330,7 @@ void directory::printDirents() {
       }
       else {
          // Check if it is a directory
-         if ( is_directory ){
+         if ( ptr->get_contents()->isDirectory() ){
             // If it is, print the name with the
             // "/" at the end of the name.
             cout << "   " << file_name << "/" << endl;

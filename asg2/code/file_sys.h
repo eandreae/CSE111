@@ -47,6 +47,7 @@ class inode_state {
       inode_ptr get_root();
       void set_cwd(inode_ptr new_cwd);
       void print_path(wordvec path_names);
+      void print_path_pwd(wordvec path_names);
       wordvec get_path();
 };
 
