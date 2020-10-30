@@ -2,6 +2,7 @@
 
 #include "commands.h"
 #include "debug.h"
+#include <sstream>
 
 command_hash cmd_hash {
    {"cat"   , fn_cat   },
@@ -15,6 +16,7 @@ command_hash cmd_hash {
    {"prompt", fn_prompt},
    {"pwd"   , fn_pwd   },
    {"rm"    , fn_rm    },
+   {"#"     , fn_comm  },
 };
 
 command_fn find_command_fn (const string& cmd) {
@@ -215,7 +217,30 @@ void fn_echo (inode_state& state, const wordvec& words){
 void fn_exit (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
-   throw ysh_exit();
+   int exit_num = 0;
+   if (words.size() < 2 ){
+      exec::status(exit_num);
+   }
+   else {
+      
+      string s = words[1];
+      // Check if it is non-numeric.
+      std::string::const_iterator it = s.begin();
+      while (it != s.end() && std::isdigit(*it)) ++it;
+      bool is_numeric = !s.empty() && it == s.end();
+
+      if( is_numeric ){
+         stringstream result(s);
+         result >> exit_num;
+         exec::status(exit_num);
+         throw ysh_exit();
+      }
+      else {
+         exit_num = 127;
+         exec::status(exit_num);
+         throw ysh_exit();
+      }
+   }
 }
 
 void fn_ls (inode_state& state, const wordvec& words){
@@ -770,5 +795,9 @@ void fn_rm (inode_state& state, const wordvec& words){
 void fn_rmr (inode_state& state, const wordvec& words){
    DEBUGF ('c', state);
    DEBUGF ('c', words);
+}
+
+void fn_comm (inode_state&, const wordvec&){
+   // Do nothing
 }
 
